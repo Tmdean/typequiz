@@ -369,7 +369,7 @@
 
       if (Math.random() < 0.25) {
         curQuestion = -1;
-        normIndex = Math.floor(Math.random() * quizData.length);
+        normIndex = Math.floor(Math.random() * normalMatches.length);
 
         document.querySelector('#attack').innerText =
           normalMatches[normIndex].attack;
@@ -415,7 +415,7 @@
           streak++;
         } else {
           document.querySelector('#result').innerText = "Incorrect";
-          if (curQuestion > 0) {
+          if (curQuestion >= 0) {
             quizData[curQuestion].correct = 0;
             document.querySelector('#incorrect').innerText =
               quizData[curQuestion].attack + ' vs ' +
