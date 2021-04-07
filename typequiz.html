@@ -1,0 +1,470 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Test</title>
+<style type="text/css">
+  * { padding: 0; margin: 0; }
+
+  body {
+    font-family: sans-serif;
+    font-size: 1.5em;
+  }
+  
+  .field { margin: 10px; }
+
+  input[type=submit] {
+    margin: 10px;
+    width: 100px;
+    height: 50px;
+  }
+
+  #incorrect {
+    margin: 10px;
+    font-size: 0.7em;
+  }
+
+  #result, #questions-left {
+    margin: 10px;
+  }
+</style>
+<script type="text/javascript">
+  window.addEventListener('load', function () {
+    var curQuestion = 0;
+    var normIndex = 0;
+    var timeoutID = -1;
+    var streak = 0;
+
+    var quizData = [
+      { attack: 'Normal', defend: 'Rock', effect: 'Half', correct: 0 },
+      { attack: 'Normal', defend: 'Ghost', effect: 'Null', correct: 0 },
+      { attack: 'Normal', defend: 'Steel', effect: 'Half', correct: 0 },
+      { attack: 'Fire', defend: 'Fire', effect: 'Half', correct: 0 },
+      { attack: 'Fire', defend: 'Water', effect: 'Half', correct: 0 },
+      { attack: 'Fire', defend: 'Grass', effect: 'Double', correct: 0 },
+      { attack: 'Fire', defend: 'Ice', effect: 'Double', correct: 0 },
+      { attack: 'Fire', defend: 'Bug', effect: 'Double', correct: 0 },
+      { attack: 'Fire', defend: 'Rock', effect: 'Half', correct: 0 },
+      { attack: 'Fire', defend: 'Dragon', effect: 'Half', correct: 0 },
+      { attack: 'Fire', defend: 'Steel', effect: 'Double', correct: 0 },
+      { attack: 'Water', defend: 'Fire', effect: 'Double', correct: 0 },
+      { attack: 'Water', defend: 'Water', effect: 'Half', correct: 0 },
+      { attack: 'Water', defend: 'Grass', effect: 'Half', correct: 0 },
+      { attack: 'Water', defend: 'Ground', effect: 'Double', correct: 0 },
+      { attack: 'Water', defend: 'Rock', effect: 'Double', correct: 0 },
+      { attack: 'Water', defend: 'Dragon', effect: 'Half', correct: 0 },
+      { attack: 'Electric', defend: 'Water', effect: 'Double', correct: 0 },
+      { attack: 'Electric', defend: 'Electric', effect: 'Half', correct: 0 },
+      { attack: 'Electric', defend: 'Grass', effect: 'Half', correct: 0 },
+      { attack: 'Electric', defend: 'Ground', effect: 'Null', correct: 0 },
+      { attack: 'Electric', defend: 'Flying', effect: 'Double', correct: 0 },
+      { attack: 'Electric', defend: 'Dragon', effect: 'Half', correct: 0 },
+      { attack: 'Grass', defend: 'Fire', effect: 'Half', correct: 0 },
+      { attack: 'Grass', defend: 'Water', effect: 'Double', correct: 0 },
+      { attack: 'Grass', defend: 'Grass', effect: 'Half', correct: 0 },
+      { attack: 'Grass', defend: 'Poison', effect: 'Half', correct: 0 },
+      { attack: 'Grass', defend: 'Ground', effect: 'Double', correct: 0 },
+      { attack: 'Grass', defend: 'Flying', effect: 'Half', correct: 0 },
+      { attack: 'Grass', defend: 'Bug', effect: 'Half', correct: 0 },
+      { attack: 'Grass', defend: 'Rock', effect: 'Double', correct: 0 },
+      { attack: 'Grass', defend: 'Dragon', effect: 'Half', correct: 0 },
+      { attack: 'Grass', defend: 'Steel', effect: 'Half', correct: 0 },
+      { attack: 'Ice', defend: 'Fire', effect: 'Half', correct: 0 },
+      { attack: 'Ice', defend: 'Water', effect: 'Half', correct: 0 },
+      { attack: 'Ice', defend: 'Grass', effect: 'Double', correct: 0 },
+      { attack: 'Ice', defend: 'Ice', effect: 'Half', correct: 0 },
+      { attack: 'Ice', defend: 'Ground', effect: 'Double', correct: 0 },
+      { attack: 'Ice', defend: 'Flying', effect: 'Double', correct: 0 },
+      { attack: 'Ice', defend: 'Dragon', effect: 'Double', correct: 0 },
+      { attack: 'Ice', defend: 'Steel', effect: 'Half', correct: 0 },
+      { attack: 'Fighting', defend: 'Normal', effect: 'Double', correct: 0 },
+      { attack: 'Fighting', defend: 'Ice', effect: 'Double', correct: 0 },
+      { attack: 'Fighting', defend: 'Poison', effect: 'Half', correct: 0 },
+      { attack: 'Fighting', defend: 'Flying', effect: 'Half', correct: 0 },
+      { attack: 'Fighting', defend: 'Psychic', effect: 'Half', correct: 0 },
+      { attack: 'Fighting', defend: 'Bug', effect: 'Half', correct: 0 },
+      { attack: 'Fighting', defend: 'Rock', effect: 'Double', correct: 0 },
+      { attack: 'Fighting', defend: 'Ghost', effect: 'Null', correct: 0 },
+      { attack: 'Fighting', defend: 'Dark', effect: 'Double', correct: 0 },
+      { attack: 'Fighting', defend: 'Steel', effect: 'Double', correct: 0 },
+      { attack: 'Fighting', defend: 'Fairy', effect: 'Half', correct: 0 },
+      { attack: 'Poison', defend: 'Grass', effect: 'Double', correct: 0 },
+      { attack: 'Poison', defend: 'Poison', effect: 'Half', correct: 0 },
+      { attack: 'Poison', defend: 'Ground', effect: 'Half', correct: 0 },
+      { attack: 'Poison', defend: 'Rock', effect: 'Half', correct: 0 },
+      { attack: 'Poison', defend: 'Ghost', effect: 'Half', correct: 0 },
+      { attack: 'Poison', defend: 'Steel', effect: 'Null', correct: 0 },
+      { attack: 'Poison', defend: 'Fairy', effect: 'Double', correct: 0 },
+      { attack: 'Ground', defend: 'Fire', effect: 'Double', correct: 0 },
+      { attack: 'Ground', defend: 'Electric', effect: 'Double', correct: 0 },
+      { attack: 'Ground', defend: 'Grass', effect: 'Half', correct: 0 },
+      { attack: 'Ground', defend: 'Poison', effect: 'Double', correct: 0 },
+      { attack: 'Ground', defend: 'Flying', effect: 'Null', correct: 0 },
+      { attack: 'Ground', defend: 'Bug', effect: 'Half', correct: 0 },
+      { attack: 'Ground', defend: 'Rock', effect: 'Double', correct: 0 },
+      { attack: 'Ground', defend: 'Steel', effect: 'Double', correct: 0 },
+      { attack: 'Flying', defend: 'Electric', effect: 'Half', correct: 0 },
+      { attack: 'Flying', defend: 'Grass', effect: 'Double', correct: 0 },
+      { attack: 'Flying', defend: 'Fighting', effect: 'Double', correct: 0 },
+      { attack: 'Flying', defend: 'Bug', effect: 'Double', correct: 0 },
+      { attack: 'Flying', defend: 'Rock', effect: 'Half', correct: 0 },
+      { attack: 'Flying', defend: 'Steel', effect: 'Half', correct: 0 },
+      { attack: 'Psychic', defend: 'Fighting', effect: 'Double', correct: 0 },
+      { attack: 'Psychic', defend: 'Poison', effect: 'Double', correct: 0 },
+      { attack: 'Psychic', defend: 'Psychic', effect: 'Half', correct: 0 },
+      { attack: 'Psychic', defend: 'Dark', effect: 'Null', correct: 0 },
+      { attack: 'Psychic', defend: 'Steel', effect: 'Half', correct: 0 },
+      { attack: 'Bug', defend: 'Fire', effect: 'Half', correct: 0 },
+      { attack: 'Bug', defend: 'Grass', effect: 'Double', correct: 0 },
+      { attack: 'Bug', defend: 'Fighting', effect: 'Half', correct: 0 },
+      { attack: 'Bug', defend: 'Poison', effect: 'Half', correct: 0 },
+      { attack: 'Bug', defend: 'Flying', effect: 'Half', correct: 0 },
+      { attack: 'Bug', defend: 'Psychic', effect: 'Double', correct: 0 },
+      { attack: 'Bug', defend: 'Ghost', effect: 'Half', correct: 0 },
+      { attack: 'Bug', defend: 'Dark', effect: 'Double', correct: 0 },
+      { attack: 'Bug', defend: 'Steel', effect: 'Half', correct: 0 },
+      { attack: 'Bug', defend: 'Fairy', effect: 'Half', correct: 0 },
+      { attack: 'Rock', defend: 'Fire', effect: 'Double', correct: 0 },
+      { attack: 'Rock', defend: 'Ice', effect: 'Double', correct: 0 },
+      { attack: 'Rock', defend: 'Fighting', effect: 'Half', correct: 0 },
+      { attack: 'Rock', defend: 'Ground', effect: 'Half', correct: 0 },
+      { attack: 'Rock', defend: 'Flying', effect: 'Double', correct: 0 },
+      { attack: 'Rock', defend: 'Bug', effect: 'Double', correct: 0 },
+      { attack: 'Rock', defend: 'Steel', effect: 'Half', correct: 0 },
+      { attack: 'Ghost', defend: 'Normal', effect: 'Null', correct: 0 },
+      { attack: 'Ghost', defend: 'Psychic', effect: 'Double', correct: 0 },
+      { attack: 'Ghost', defend: 'Ghost', effect: 'Double', correct: 0 },
+      { attack: 'Ghost', defend: 'Dark', effect: 'Half', correct: 0 },
+      { attack: 'Dragon', defend: 'Dragon', effect: 'Double', correct: 0 },
+      { attack: 'Dragon', defend: 'Steel', effect: 'Half', correct: 0 },
+      { attack: 'Dragon', defend: 'Fairy', effect: 'Null', correct: 0 },
+      { attack: 'Dark', defend: 'Fighting', effect: 'Half', correct: 0 },
+      { attack: 'Dark', defend: 'Psychic', effect: 'Double', correct: 0 },
+      { attack: 'Dark', defend: 'Ghost', effect: 'Double', correct: 0 },
+      { attack: 'Dark', defend: 'Dark', effect: 'Half', correct: 0 },
+      { attack: 'Dark', defend: 'Fairy', effect: 'Half', correct: 0 },
+      { attack: 'Steel', defend: 'Fire', effect: 'Half', correct: 0 },
+      { attack: 'Steel', defend: 'Water', effect: 'Half', correct: 0 },
+      { attack: 'Steel', defend: 'Electric', effect: 'Half', correct: 0 },
+      { attack: 'Steel', defend: 'Ice', effect: 'Double', correct: 0 },
+      { attack: 'Steel', defend: 'Rock', effect: 'Double', correct: 0 },
+      { attack: 'Steel', defend: 'Steel', effect: 'Half', correct: 0 },
+      { attack: 'Steel', defend: 'Fairy', effect: 'Double', correct: 0 },
+      { attack: 'Fairy', defend: 'Fire', effect: 'Half', correct: 0 },
+      { attack: 'Fairy', defend: 'Fighting', effect: 'Double', correct: 0 },
+      { attack: 'Fairy', defend: 'Poison', effect: 'Half', correct: 0 },
+      { attack: 'Fairy', defend: 'Dragon', effect: 'Double', correct: 0 },
+      { attack: 'Fairy', defend: 'Dark', effect: 'Double', correct: 0 },
+      { attack: 'Fairy', defend: 'Steel', effect: 'Half', correct: 0 }
+    ];
+
+    var normalMatches = [
+      { attack: 'Normal', defend: 'Normal', effect: 'Normal' },
+      { attack: 'Normal', defend: 'Fire', effect: 'Normal' },
+      { attack: 'Normal', defend: 'Water', effect: 'Normal' },
+      { attack: 'Normal', defend: 'Electric', effect: 'Normal' },
+      { attack: 'Normal', defend: 'Grass', effect: 'Normal' },
+      { attack: 'Normal', defend: 'Ice', effect: 'Normal' },
+      { attack: 'Normal', defend: 'Fighting', effect: 'Normal' },
+      { attack: 'Normal', defend: 'Poison', effect: 'Normal' },
+      { attack: 'Normal', defend: 'Ground', effect: 'Normal' },
+      { attack: 'Normal', defend: 'Flying', effect: 'Normal' },
+      { attack: 'Normal', defend: 'Psychic', effect: 'Normal' },
+      { attack: 'Normal', defend: 'Bug', effect: 'Normal' },
+      { attack: 'Normal', defend: 'Dragon', effect: 'Normal' },
+      { attack: 'Normal', defend: 'Dark', effect: 'Normal' },
+      { attack: 'Normal', defend: 'Fairy', effect: 'Normal' },
+      { attack: 'Fire', defend: 'Normal', effect: 'Normal' },
+      { attack: 'Fire', defend: 'Electric', effect: 'Normal' },
+      { attack: 'Fire', defend: 'Fighting', effect: 'Normal' },
+      { attack: 'Fire', defend: 'Poison', effect: 'Normal' },
+      { attack: 'Fire', defend: 'Ground', effect: 'Normal' },
+      { attack: 'Fire', defend: 'Flying', effect: 'Normal' },
+      { attack: 'Fire', defend: 'Psychic', effect: 'Normal' },
+      { attack: 'Fire', defend: 'Ghost', effect: 'Normal' },
+      { attack: 'Fire', defend: 'Dark', effect: 'Normal' },
+      { attack: 'Fire', defend: 'Fairy', effect: 'Normal' },
+      { attack: 'Water', defend: 'Normal', effect: 'Normal' },
+      { attack: 'Water', defend: 'Electric', effect: 'Normal' },
+      { attack: 'Water', defend: 'Ice', effect: 'Normal' },
+      { attack: 'Water', defend: 'Fighting', effect: 'Normal' },
+      { attack: 'Water', defend: 'Poison', effect: 'Normal' },
+      { attack: 'Water', defend: 'Flying', effect: 'Normal' },
+      { attack: 'Water', defend: 'Psychic', effect: 'Normal' },
+      { attack: 'Water', defend: 'Bug', effect: 'Normal' },
+      { attack: 'Water', defend: 'Ghost', effect: 'Normal' },
+      { attack: 'Water', defend: 'Dark', effect: 'Normal' },
+      { attack: 'Water', defend: 'Steel', effect: 'Normal' },
+      { attack: 'Water', defend: 'Fairy', effect: 'Normal' },
+      { attack: 'Electric', defend: 'Normal', effect: 'Normal' },
+      { attack: 'Electric', defend: 'Fire', effect: 'Normal' },
+      { attack: 'Electric', defend: 'Ice', effect: 'Normal' },
+      { attack: 'Electric', defend: 'Fighting', effect: 'Normal' },
+      { attack: 'Electric', defend: 'Poison', effect: 'Normal' },
+      { attack: 'Electric', defend: 'Psychic', effect: 'Normal' },
+      { attack: 'Electric', defend: 'Bug', effect: 'Normal' },
+      { attack: 'Electric', defend: 'Rock', effect: 'Normal' },
+      { attack: 'Electric', defend: 'Ghost', effect: 'Normal' },
+      { attack: 'Electric', defend: 'Dark', effect: 'Normal' },
+      { attack: 'Electric', defend: 'Steel', effect: 'Normal' },
+      { attack: 'Electric', defend: 'Fairy', effect: 'Normal' },
+      { attack: 'Grass', defend: 'Normal', effect: 'Normal' },
+      { attack: 'Grass', defend: 'Electric', effect: 'Normal' },
+      { attack: 'Grass', defend: 'Ice', effect: 'Normal' },
+      { attack: 'Grass', defend: 'Fighting', effect: 'Normal' },
+      { attack: 'Grass', defend: 'Psychic', effect: 'Normal' },
+      { attack: 'Grass', defend: 'Ghost', effect: 'Normal' },
+      { attack: 'Grass', defend: 'Dark', effect: 'Normal' },
+      { attack: 'Grass', defend: 'Fairy', effect: 'Normal' },
+      { attack: 'Ice', defend: 'Normal', effect: 'Normal' },
+      { attack: 'Ice', defend: 'Electric', effect: 'Normal' },
+      { attack: 'Ice', defend: 'Fighting', effect: 'Normal' },
+      { attack: 'Ice', defend: 'Poison', effect: 'Normal' },
+      { attack: 'Ice', defend: 'Psychic', effect: 'Normal' },
+      { attack: 'Ice', defend: 'Bug', effect: 'Normal' },
+      { attack: 'Ice', defend: 'Rock', effect: 'Normal' },
+      { attack: 'Ice', defend: 'Ghost', effect: 'Normal' },
+      { attack: 'Ice', defend: 'Dark', effect: 'Normal' },
+      { attack: 'Ice', defend: 'Fairy', effect: 'Normal' },
+      { attack: 'Fighting', defend: 'Fire', effect: 'Normal' },
+      { attack: 'Fighting', defend: 'Water', effect: 'Normal' },
+      { attack: 'Fighting', defend: 'Electric', effect: 'Normal' },
+      { attack: 'Fighting', defend: 'Grass', effect: 'Normal' },
+      { attack: 'Fighting', defend: 'Fighting', effect: 'Normal' },
+      { attack: 'Fighting', defend: 'Ground', effect: 'Normal' },
+      { attack: 'Fighting', defend: 'Dragon', effect: 'Normal' },
+      { attack: 'Poison', defend: 'Normal', effect: 'Normal' },
+      { attack: 'Poison', defend: 'Fire', effect: 'Normal' },
+      { attack: 'Poison', defend: 'Water', effect: 'Normal' },
+      { attack: 'Poison', defend: 'Electric', effect: 'Normal' },
+      { attack: 'Poison', defend: 'Ice', effect: 'Normal' },
+      { attack: 'Poison', defend: 'Fighting', effect: 'Normal' },
+      { attack: 'Poison', defend: 'Flying', effect: 'Normal' },
+      { attack: 'Poison', defend: 'Psychic', effect: 'Normal' },
+      { attack: 'Poison', defend: 'Bug', effect: 'Normal' },
+      { attack: 'Poison', defend: 'Dragon', effect: 'Normal' },
+      { attack: 'Poison', defend: 'Dark', effect: 'Normal' },
+      { attack: 'Ground', defend: 'Normal', effect: 'Normal' },
+      { attack: 'Ground', defend: 'Water', effect: 'Normal' },
+      { attack: 'Ground', defend: 'Ice', effect: 'Normal' },
+      { attack: 'Ground', defend: 'Fighting', effect: 'Normal' },
+      { attack: 'Ground', defend: 'Ground', effect: 'Normal' },
+      { attack: 'Ground', defend: 'Psychic', effect: 'Normal' },
+      { attack: 'Ground', defend: 'Ghost', effect: 'Normal' },
+      { attack: 'Ground', defend: 'Dragon', effect: 'Normal' },
+      { attack: 'Ground', defend: 'Dark', effect: 'Normal' },
+      { attack: 'Ground', defend: 'Fairy', effect: 'Normal' },
+      { attack: 'Flying', defend: 'Normal', effect: 'Normal' },
+      { attack: 'Flying', defend: 'Fire', effect: 'Normal' },
+      { attack: 'Flying', defend: 'Water', effect: 'Normal' },
+      { attack: 'Flying', defend: 'Ice', effect: 'Normal' },
+      { attack: 'Flying', defend: 'Poison', effect: 'Normal' },
+      { attack: 'Flying', defend: 'Ground', effect: 'Normal' },
+      { attack: 'Flying', defend: 'Flying', effect: 'Normal' },
+      { attack: 'Flying', defend: 'Psychic', effect: 'Normal' },
+      { attack: 'Flying', defend: 'Ghost', effect: 'Normal' },
+      { attack: 'Flying', defend: 'Dragon', effect: 'Normal' },
+      { attack: 'Flying', defend: 'Dark', effect: 'Normal' },
+      { attack: 'Flying', defend: 'Fairy', effect: 'Normal' },
+      { attack: 'Psychic', defend: 'Normal', effect: 'Normal' },
+      { attack: 'Psychic', defend: 'Fire', effect: 'Normal' },
+      { attack: 'Psychic', defend: 'Water', effect: 'Normal' },
+      { attack: 'Psychic', defend: 'Electric', effect: 'Normal' },
+      { attack: 'Psychic', defend: 'Grass', effect: 'Normal' },
+      { attack: 'Psychic', defend: 'Ice', effect: 'Normal' },
+      { attack: 'Psychic', defend: 'Ground', effect: 'Normal' },
+      { attack: 'Psychic', defend: 'Flying', effect: 'Normal' },
+      { attack: 'Psychic', defend: 'Bug', effect: 'Normal' },
+      { attack: 'Psychic', defend: 'Rock', effect: 'Normal' },
+      { attack: 'Psychic', defend: 'Ghost', effect: 'Normal' },
+      { attack: 'Psychic', defend: 'Dragon', effect: 'Normal' },
+      { attack: 'Psychic', defend: 'Fairy', effect: 'Normal' },
+      { attack: 'Bug', defend: 'Normal', effect: 'Normal' },
+      { attack: 'Bug', defend: 'Water', effect: 'Normal' },
+      { attack: 'Bug', defend: 'Electric', effect: 'Normal' },
+      { attack: 'Bug', defend: 'Ice', effect: 'Normal' },
+      { attack: 'Bug', defend: 'Ground', effect: 'Normal' },
+      { attack: 'Bug', defend: 'Bug', effect: 'Normal' },
+      { attack: 'Bug', defend: 'Rock', effect: 'Normal' },
+      { attack: 'Bug', defend: 'Dragon', effect: 'Normal' },
+      { attack: 'Rock', defend: 'Normal', effect: 'Normal' },
+      { attack: 'Rock', defend: 'Water', effect: 'Normal' },
+      { attack: 'Rock', defend: 'Electric', effect: 'Normal' },
+      { attack: 'Rock', defend: 'Grass', effect: 'Normal' },
+      { attack: 'Rock', defend: 'Poison', effect: 'Normal' },
+      { attack: 'Rock', defend: 'Psychic', effect: 'Normal' },
+      { attack: 'Rock', defend: 'Rock', effect: 'Normal' },
+      { attack: 'Rock', defend: 'Ghost', effect: 'Normal' },
+      { attack: 'Rock', defend: 'Dragon', effect: 'Normal' },
+      { attack: 'Rock', defend: 'Dark', effect: 'Normal' },
+      { attack: 'Rock', defend: 'Fairy', effect: 'Normal' },
+      { attack: 'Ghost', defend: 'Fire', effect: 'Normal' },
+      { attack: 'Ghost', defend: 'Water', effect: 'Normal' },
+      { attack: 'Ghost', defend: 'Electric', effect: 'Normal' },
+      { attack: 'Ghost', defend: 'Grass', effect: 'Normal' },
+      { attack: 'Ghost', defend: 'Ice', effect: 'Normal' },
+      { attack: 'Ghost', defend: 'Fighting', effect: 'Normal' },
+      { attack: 'Ghost', defend: 'Poison', effect: 'Normal' },
+      { attack: 'Ghost', defend: 'Ground', effect: 'Normal' },
+      { attack: 'Ghost', defend: 'Flying', effect: 'Normal' },
+      { attack: 'Ghost', defend: 'Bug', effect: 'Normal' },
+      { attack: 'Ghost', defend: 'Rock', effect: 'Normal' },
+      { attack: 'Ghost', defend: 'Dragon', effect: 'Normal' },
+      { attack: 'Ghost', defend: 'Steel', effect: 'Normal' },
+      { attack: 'Ghost', defend: 'Fairy', effect: 'Normal' },
+      { attack: 'Dragon', defend: 'Normal', effect: 'Normal' },
+      { attack: 'Dragon', defend: 'Fire', effect: 'Normal' },
+      { attack: 'Dragon', defend: 'Water', effect: 'Normal' },
+      { attack: 'Dragon', defend: 'Electric', effect: 'Normal' },
+      { attack: 'Dragon', defend: 'Grass', effect: 'Normal' },
+      { attack: 'Dragon', defend: 'Ice', effect: 'Normal' },
+      { attack: 'Dragon', defend: 'Fighting', effect: 'Normal' },
+      { attack: 'Dragon', defend: 'Poison', effect: 'Normal' },
+      { attack: 'Dragon', defend: 'Ground', effect: 'Normal' },
+      { attack: 'Dragon', defend: 'Flying', effect: 'Normal' },
+      { attack: 'Dragon', defend: 'Psychic', effect: 'Normal' },
+      { attack: 'Dragon', defend: 'Bug', effect: 'Normal' },
+      { attack: 'Dragon', defend: 'Rock', effect: 'Normal' },
+      { attack: 'Dragon', defend: 'Ghost', effect: 'Normal' },
+      { attack: 'Dragon', defend: 'Dark', effect: 'Normal' },
+      { attack: 'Dark', defend: 'Normal', effect: 'Normal' },
+      { attack: 'Dark', defend: 'Fire', effect: 'Normal' },
+      { attack: 'Dark', defend: 'Water', effect: 'Normal' },
+      { attack: 'Dark', defend: 'Electric', effect: 'Normal' },
+      { attack: 'Dark', defend: 'Grass', effect: 'Normal' },
+      { attack: 'Dark', defend: 'Ice', effect: 'Normal' },
+      { attack: 'Dark', defend: 'Poison', effect: 'Normal' },
+      { attack: 'Dark', defend: 'Ground', effect: 'Normal' },
+      { attack: 'Dark', defend: 'Flying', effect: 'Normal' },
+      { attack: 'Dark', defend: 'Bug', effect: 'Normal' },
+      { attack: 'Dark', defend: 'Rock', effect: 'Normal' },
+      { attack: 'Dark', defend: 'Dragon', effect: 'Normal' },
+      { attack: 'Dark', defend: 'Steel', effect: 'Normal' },
+      { attack: 'Steel', defend: 'Normal', effect: 'Normal' },
+      { attack: 'Steel', defend: 'Grass', effect: 'Normal' },
+      { attack: 'Steel', defend: 'Fighting', effect: 'Normal' },
+      { attack: 'Steel', defend: 'Poison', effect: 'Normal' },
+      { attack: 'Steel', defend: 'Ground', effect: 'Normal' },
+      { attack: 'Steel', defend: 'Flying', effect: 'Normal' },
+      { attack: 'Steel', defend: 'Psychic', effect: 'Normal' },
+      { attack: 'Steel', defend: 'Bug', effect: 'Normal' },
+      { attack: 'Steel', defend: 'Ghost', effect: 'Normal' },
+      { attack: 'Steel', defend: 'Dragon', effect: 'Normal' },
+      { attack: 'Steel', defend: 'Dark', effect: 'Normal' },
+      { attack: 'Fairy', defend: 'Normal', effect: 'Normal' },
+      { attack: 'Fairy', defend: 'Water', effect: 'Normal' },
+      { attack: 'Fairy', defend: 'Electric', effect: 'Normal' },
+      { attack: 'Fairy', defend: 'Grass', effect: 'Normal' },
+      { attack: 'Fairy', defend: 'Ice', effect: 'Normal' },
+      { attack: 'Fairy', defend: 'Ground', effect: 'Normal' },
+      { attack: 'Fairy', defend: 'Flying', effect: 'Normal' },
+      { attack: 'Fairy', defend: 'Psychic', effect: 'Normal' },
+      { attack: 'Fairy', defend: 'Bug', effect: 'Normal' },
+      { attack: 'Fairy', defend: 'Rock', effect: 'Normal' },
+      { attack: 'Fairy', defend: 'Ghost', effect: 'Normal' },
+      { attack: 'Fairy', defend: 'Fairy', effect: 'Normal' },
+    ];
+
+    function askQuestion() {
+      if (quizData.length == 0) return;
+
+      if (Math.random() < 0.25) {
+        curQuestion = -1;
+        normIndex = Math.floor(Math.random() * quizData.length);
+
+        document.querySelector('#attack').innerText =
+          normalMatches[normIndex].attack;
+        document.querySelector('#defend').innerText =
+          normalMatches[normIndex].defend;
+      } else {
+        curQuestion = Math.floor(Math.random() * quizData.length);
+
+        document.querySelector('#attack').innerText =
+          quizData[curQuestion].attack;
+        document.querySelector('#defend').innerText =
+          quizData[curQuestion].defend;
+      }
+    }
+
+    document.addEventListener('keyup', function (event) {
+      if (event.key == 'n') {
+        document.querySelector('#null').click();
+      } else if (event.key == 'h') {
+        document.querySelector('#half').click();
+      } else if (event.key == 'd') {
+        document.querySelector('#double').click();
+      }
+    });
+
+    document.querySelector('form').addEventListener('submit',
+      function (event) {
+        event.preventDefault();
+        var answer = document.querySelector('form').elements.attack.value;
+
+        if ((curQuestion == -1 && answer == 'Normal') ||
+          (curQuestion >= 0 && answer == quizData[curQuestion].effect))
+        {
+          document.querySelector('#result').innerText = "Correct!";
+          if (curQuestion >= 0) {
+            quizData[curQuestion].correct++;
+            if (quizData[curQuestion].correct >= 3) {
+              quizData.splice(curQuestion, 1);
+              document.querySelector('#questions-left').innerText = quizData.length +
+                ' matches left';
+            }
+          }
+          streak++;
+        } else {
+          document.querySelector('#result').innerText = "Incorrect";
+          if (curQuestion > 0) {
+            quizData[curQuestion].correct = 0;
+            document.querySelector('#incorrect').innerText =
+              quizData[curQuestion].attack + ' vs ' +
+              quizData[curQuestion].defend + ' is ' +
+              quizData[curQuestion].effect + ' (streak: ' + streak + ')';
+          } else {
+            document.querySelector('#incorrect').innerText =
+              normalMatches[normIndex].attack + ' vs ' +
+              normalMatches[normIndex].defend + ' is Normal ' +
+                '(streak: '  + streak + ')';
+          }
+          streak = 0;
+        }
+
+        if (timeoutID > 0) {
+          clearTimeout(timeoutID);
+        }
+
+        timeoutID = setTimeout(function () {
+          document.querySelector('#result').innerText = streak + ' in a row';
+        }, 1500);
+        askQuestion();
+      });
+
+    askQuestion();
+  });
+</script>
+  </head>
+  <body>
+    <p id="questions-left">120 matches left</p>
+    <h1 id="result"></h1>
+    <form>
+      <div class="field">Attacking: <span id="attack"></span></div>
+      <div class="field">Defending: <span id="defend"></span></div>
+      <div class="field">
+        <input type="radio" name="attack" id="null" value="Null">
+        <label for="null">Null</label>
+        <input type="radio" name="attack" id="half" value="Half">
+        <label for="half">Half</label>
+        <input type="radio" name="attack" id="normal" value="Normal">
+        <label for="normal">Normal</label>
+        <input type="radio" name="attack" id="double" value="Double">
+        <label for="double">Double</label>
+      </div>
+      <input type="submit" value="submit">
+    </form>
+    <div id="incorrect">
+    </div>
+  </body>
+</html>
+
+
